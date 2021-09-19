@@ -4,12 +4,19 @@
 from models import storage
 from os import getenv
 from api.v1.views import app_views
-from flask import Flask
+from flask import Flask, jsonify, abort
 
 app = Flask(__name__)
 
 
 app.register_blueprint(app_views)
+
+
+@app.errorhandler(404)
+def error_handler(error):
+    """Error handler, 404 response"""
+    response = jsonify({"error": "Not found"})
+    return response, 404
 
 
 @app.teardown_appcontext
