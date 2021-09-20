@@ -70,9 +70,16 @@ def view_state(id):
 
         if isinstance(element, dict):
             return (jsonify({"error": "Not a JSON"}), 400)
-        for key, value in data.items():
-            if key not in ["id", "created_at", "updated_at"]:
-                setattr(state, key, value)
+
+        if 'id' in data.keys():
+            data.pop(id)
+        if 'created_at' in data.keys():
+            data.pop(created_at)
+        if 'updated_at' in data.keys():
+            data.pop(updated_at)
+
+        for key, value in data:
+            state.update({key: value})
+
         storage.save()
-        state = state.to_dict()
-        return jsonify(state)
+        return jsonify(state.to_dict())
