@@ -23,6 +23,8 @@ def view_states():
             data.pop(updated_at)
         if 'name' not in data.keys():
             return jsonify({'error': 'Missing name'}), 400
+        if data is None:
+            return (jsonify({"error": "Not a JSON"}), 400)
 
         # Create the object
         obj = State(**data)
