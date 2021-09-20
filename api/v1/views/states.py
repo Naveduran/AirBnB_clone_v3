@@ -15,16 +15,18 @@ def view_states():
 
         # Get the attributes from the request
         data = request.get_json()
+
+        if isinstance(element, dict):
+            return (jsonify({"error": "Not a JSON"}), 400)
+        if 'name' not in data.keys():
+            return jsonify({'error': 'Missing name'}), 400
+
         if 'id' in data.keys():
             data.pop(id)
         if 'created_at' in data.keys():
             data.pop(created_at)
         if 'updated_at' in data.keys():
             data.pop(updated_at)
-        if 'name' not in data.keys():
-            return jsonify({'error': 'Missing name'}), 400
-        if data is None:
-            return (jsonify({"error": "Not a JSON"}), 400)
 
         # Create the object
         obj = State(**data)
@@ -65,7 +67,8 @@ def view_state(id):
 
     if request.method == 'PUT':
         data = request.get_json()
-        if data is None:
+
+        if isinstance(element, dict):
             return (jsonify({"error": "Not a JSON"}), 400)
         for key, value in data.items():
             if key not in ["id", "created_at", "updated_at"]:
