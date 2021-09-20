@@ -61,7 +61,7 @@ def view_state(id):
     if request.method == 'DELETE':
         storage.delete(state)
         storage.save()
-        return jsonify({})
+        return jsonify({}), 200
 
     if request.method == 'PUT':
         data = request.get_json()
