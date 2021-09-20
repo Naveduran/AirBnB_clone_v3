@@ -15,16 +15,21 @@ def view_amenities():
 
         # Get the attributes from the request
         data = request.get_json()
-        if 'id' in data.keys():
-            data.pop(id)
-        if 'created_at' in data.keys():
-            data.pop(created_at)
-        if 'updated_at' in data.keys():
-            data.pop(updated_at)
+
+        if isinstance(data, dict):
+            pass
+        else:
+            return jsonify({"error": "Not a JSON"}), 400
+
         if 'name' not in data.keys():
             return jsonify({'error': 'Missing name'}), 400
-        if data is None:
-            return (jsonify({"error": "Not a JSON"}), 400)
+
+        if 'id' in data.keys():
+            data.pop("id")
+        if 'created_at' in data.keys():
+            data.pop("created_at")
+        if 'updated_at' in data.keys():
+            data.pop("updated_at")
 
         # Create the object
         obj = Amenity(**data)
@@ -49,27 +54,30 @@ def view_amenity(id):
     """Returns a list of all Amenity objects, or delete an
     object if a given id
     """
-    amenity_data = storage.get(Amenity, id)
+    amenity = storage.get(Amenity, id)
 
-    if amenity_data is None:
+    if amenity is None:
         return abort(404)
 
     if request.method == 'GET':
-        data = amenity_data.to_dict()
-        return jsonify(data)
+        return jsonify(amenity.to_dict())
 
     if request.method == 'DELETE':
-        storage.delete(amenity_data)
+        storage.delete(amenity)
         storage.save()
-        return jsonify({})
+        return jsonify({}), 200
 
     if request.method == 'PUT':
         data = request.get_json()
-        if data is None:
-            return (jsonify({"error": "Not a JSON"}), 400)
+
+        if isinstance(data, dict):
+            pass
+        else:
+            return jsonify({"error": "Not a JSON"}), 400
+
         for key, value in data.items():
             if key not in ["id", "created_at", "updated_at"]:
-                setattr(amenity_data, key, value)
+                setattr(amenity, key, value)
+
         storage.save()
-        amenity_data = amenity_data.to_dict()
-        return jsonify(amenity_data)
+        return jsonify(amenity.to_dict())
