@@ -38,12 +38,13 @@ def view_states():
         for name, state in states.items():
             list.append(state.to_dict())
         return jsonify(list)
-    
+
     if request.method == 'PUT':
         data = request.get_json()
         if data is None:
             return (jsonify({"error": "Not a JSON"}), 400)
-        
+
+
 @app_views.route('/states/<id>',
                  strict_slashes=False,
                  methods=['GET', 'DELETE', 'PUT'])
