@@ -16,8 +16,11 @@ def view_states():
         # Get the attributes from the request
         data = request.get_json()
 
-        if isinstance(element, dict):
+        if isinstance(data, dict):
+            pass
+        else:
             return (jsonify({"error": "Not a JSON"}), 400)
+
         if 'name' not in data.keys():
             return jsonify({'error': 'Missing name'}), 400
 
@@ -67,8 +70,6 @@ def view_state(id):
 
     if request.method == 'PUT':
         data = request.get_json()
-
-        print(type(data))
         if isinstance(data, dict):
             pass
         else:
