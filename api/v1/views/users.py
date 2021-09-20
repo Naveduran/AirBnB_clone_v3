@@ -15,18 +15,23 @@ def view_users():
 
         # Get the attributes from the request
         data = request.get_json()
+
+        if isinstance(data, dict):
+            pass
+        else:
+            return jsonify({"error": "Not a JSON"}), 400
+
         if 'id' in data.keys():
-            data.pop(id)
+            data.pop("id")
         if 'created_at' in data.keys():
-            data.pop(created_at)
+            data.pop("created_at")
         if 'updated_at' in data.keys():
-            data.pop(updated_at)
+            data.pop("updated_at")
+
         if 'email' not in data.keys():
             return jsonify({'error': 'Missing email'}), 400
         if 'password' not in data.keys():
-            return jsonify({'error': 'Missing password'}), 400 
-        if data is None:
-            return (jsonify({"error": "Not a JSON"}), 400)
+            return jsonify({'error': 'Missing password'}), 400
 
         # Create the object
         obj = User(**data)
@@ -37,10 +42,10 @@ def view_users():
         return jsonify(obj.to_dict()), 201
 
     if request.method == 'GET':
-        uaer_data = storage.all("User")
+        users = storage.all("User")
         list = []
-        for name, user_obj in User.items():
-            list.append(user_obj.to_dict())
+        for name, user in users.items():
+            list.append(user.to_dict())
         return jsonify(list)
 
 
@@ -51,27 +56,29 @@ def view_user(id):
     """Returns a list of all User objects, or delete an
     object if a given id
     """
-    user_data = storage.get(User, id)
+    user = storage.get(User, id)
 
-    if user_data is None:
+    if user is None:
         return abort(404)
 
     if request.method == 'GET':
-        data = user_data.to_dict()
-        return jsonify(data)
+        return jsonify(user.to_dict())
 
     if request.method == 'DELETE':
-        storage.delete(user_data)
+        storage.delete(user)
         storage.save()
-        return jsonify({})
+        return jsonify({}), 200
 
     if request.method == 'PUT':
         data = request.get_json()
-        if data is None:
-            return (jsonify({"error": "Not a JSON"}), 400)
+        if isinstance(data, dict):
+            pass
+        else:
+            return jsonify({"error": "Not a JSON"}), 400
+
         for key, value in data.items():
             if key not in ["id", "email", "created_at", "updated_at"]:
-                setattr(user_data, key, value)
+                setattr(user, key, value)
+
         storage.save()
-        user_data = user_data.to_dict()
-        return jsonify(user_data)
+        return jsonify(user.to_dict())
