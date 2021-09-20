@@ -31,10 +31,12 @@ def view_cities_of_state(id):
         data = request.get_json()
 
         if isinstance(data, dict):
-            if 'name' not in data.keys():
-                return jsonify({'error': 'Missing name'}), 400
+            pass
         else:
-            return (jsonify({"error": "Not a JSON"}), 400)
+            return jsonify({"error": "Not a JSON"}), 400
+
+        if 'name' not in data.keys():
+            return jsonify({'error': 'Missing name'}), 400
 
         if 'id' in data.keys():
             data.pop("id")
@@ -73,13 +75,11 @@ def view_city_id(id):
         return jsonify({}), 200
 
     if request.method == 'PUT':
-
         data = request.get_json()
-
         if isinstance(data, dict):
             pass
         else:
-            return (jsonify({"error": "Not a JSON"}), 400)
+            return jsonify({"error": "Not a JSON"}), 400
 
         if 'id' in data.keys():
             data.pop("id")
@@ -92,4 +92,4 @@ def view_city_id(id):
             setattr(city, key, value)
 
         storage.save()
-        return jsonify(state.to_dict())
+        return jsonify(city.to_dict())
