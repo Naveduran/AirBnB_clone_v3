@@ -22,11 +22,11 @@ def view_states():
             return jsonify({'error': 'Missing name'}), 400
 
         if 'id' in data.keys():
-            data.pop(id)
+            data.pop("id")
         if 'created_at' in data.keys():
-            data.pop(created_at)
+            data.pop("created_at")
         if 'updated_at' in data.keys():
-            data.pop(updated_at)
+            data.pop("updated_at")
 
         # Create the object
         obj = State(**data)
