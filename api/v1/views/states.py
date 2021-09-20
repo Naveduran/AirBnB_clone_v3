@@ -8,7 +8,7 @@ from models.state import State
 
 @app_views.route('/states',
                  strict_slashes=False,
-                 methods=['GET', 'POST'])
+                 methods=['GET', 'POST', 'PUT'])
 def view_states():
     """Returns the list of all State objects"""
     if request.method == 'POST':
@@ -38,11 +38,15 @@ def view_states():
         for name, state in states.items():
             list.append(state.to_dict())
         return jsonify(list)
-
-
+    
+    if request.method == 'PUT':
+        data = request.get_json()
+        if data is None:
+            return (jsonify({"error": "Not a JSON"}), 400)
+        
 @app_views.route('/states/<id>',
                  strict_slashes=False,
-                 methods=['GET', 'DELETE'])
+                 methods=['GET', 'DELETE', 'PUT'])
 def view_state(id):
     """Returns a list of all State objects, or delete an
     object if a given id
@@ -60,3 +64,12 @@ def view_state(id):
         storage.delete(state)
         storage.save()
         return jsonify({})
+
+    if request.method == 'PUT':
+        data = request.get_json()
+        for key, value in data.items():
+            if key not in ["id", "created_at", "updated_at"]:
+                setattr(state, key, value)
+        storage.save()
+        state = state.to_dict()
+        return jsonify(state)
