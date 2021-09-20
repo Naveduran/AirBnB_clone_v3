@@ -68,18 +68,21 @@ def view_state(id):
     if request.method == 'PUT':
         data = request.get_json()
 
-        if isinstance(element, dict):
+        print(type(data))
+        if isinstance(data, dict):
+            pass
+        else:
             return (jsonify({"error": "Not a JSON"}), 400)
 
         if 'id' in data.keys():
-            data.pop(id)
+            data.pop("id")
         if 'created_at' in data.keys():
-            data.pop(created_at)
+            data.pop("created_at")
         if 'updated_at' in data.keys():
-            data.pop(updated_at)
+            data.pop("updated_at")
 
-        for key, value in data:
-            state.update({key: value})
+        for key, value in data.items():
+            setattr(state, key, value)
 
         storage.save()
         return jsonify(state.to_dict())
