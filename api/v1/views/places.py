@@ -12,14 +12,14 @@ from models.place import Place
 @app_views.route('/cities/<id>/places',
                  strict_slashes=False,
                  methods=['GET', 'POST'])
-def view_cities_of_state(id):
+def view_places(id):
     """Returns a list of all places of a city, or delete a
     place if a given id
     """
     city = storage.get(City, id)
     user = storage.get(User, id)
 
-    if city is None or user is None:
+    if city is None:
         return abort(404)
 
     if request.method == 'GET':
@@ -31,6 +31,9 @@ def view_cities_of_state(id):
 
     if request.method == 'POST':
         # Get the attributes from the request
+        if user is None:
+            return abort(404)
+
         data = request.get_json()
 
         if isinstance(data, dict):
@@ -43,13 +46,6 @@ def view_cities_of_state(id):
 
         if 'user_id' not in data.keys():
             return jsonify({'error': 'Missing user_id'}), 400
-
-        if 'id' in data.keys():
-            data.pop("id")
-        if 'created_at' in data.keys():
-            data.pop("created_at")
-        if 'updated_at' in data.keys():
-            data.pop("updated_at")
 
         data.update({"place_id": id})
 
@@ -65,7 +61,7 @@ def view_cities_of_state(id):
 @app_views.route('/places/<id>',
                  strict_slashes=False,
                  methods=['GET', 'DELETE', 'PUT'])
-def view_city_id(id):
+def view_place_by_id(id):
     """Returns or erases a place"""
     place = storage.get(Place, id)
 
@@ -73,7 +69,7 @@ def view_city_id(id):
         return abort(404)
 
     if request.method == 'GET':
-        return jsonify(city.to_dict())
+        return jsonify(place.to_dict())
 
     if request.method == 'DELETE':
         storage.delete(place)
@@ -87,15 +83,10 @@ def view_city_id(id):
         else:
             return jsonify({"error": "Not a JSON"}), 400
 
-        if 'id' in data.keys():
-            data.pop("id")
-        if 'created_at' in data.keys():
-            data.pop("created_at")
-        if 'updated_at' in data.keys():
-            data.pop("updated_at")
-
         for key, value in data.items():
-            setattr(place, key, value)
+            if key not in ["id", "user_id", "city_id",
+                           "created_at", "updated_at"]:
+                setattr(place, key, value)
 
         storage.save()
-        return jsonify(place.to_dict())
+        return jsonify(place.to_dict()), 200
