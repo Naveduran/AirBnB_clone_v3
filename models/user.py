@@ -31,7 +31,9 @@ class User(BaseModel, Base):
         from hashlib import md5
         if name == "password":
             hash = md5(value.encode('utf-8'))
-        self.__dict__[name] = hash.hexdigest()
+            self.__dict__[name] = hash.hexdigest()
+        else:
+            self.__dict__[name] = value
 
     def __init__(self, *args, **kwargs):
         """initializes user"""
