@@ -25,7 +25,7 @@ def view_places(id):
     if request.method == 'GET':
 
         list = []
-        for place in city.cities:
+        for place in city.places:
             list.append(place.to_dict())
         return jsonify(list)
 
